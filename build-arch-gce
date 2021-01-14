@@ -53,6 +53,17 @@ mount_dir=$work_dir/disk.mnt
 mkdir -- "$mount_dir"
 mount -- "$root_dev" "$mount_dir"
 
+echo '- Copy the host pacman mirrorlist'
+mkdir -p $mount_dir/etc/pacman.d/
+cp /etc/pacman.d/mirrorlist $mount_dir/etc/pacman.d/
+
+echo '- Copy the host pacman gnupg'
+rsync -r /etc/pacman.d/gnupg $mount_dir/etc/pacman.d/
+
+echo '- Copy the host pacman database caches'
+mkdir -p $mount_dir/var/lib/pacman/sync
+rsync -r /var/lib/pacman/sync/ $mount_dir/var/lib/pacman/sync/
+
 echo '- Installing Arch Linux.'
 append_gce_repo() {
 	gawk -i inplace '
@@ -112,11 +123,6 @@ arch-chroot -- "$mount_dir" /bin/bash -s -- "$loop_dev" <<-'EOS'
 	systemctl --quiet enable sshd.service
 
 	echo '-- Configuring pacman.'
-	curl --silent --show-error -o /etc/pacman.d/mirrorlist \
-		'https://archlinux.org/mirrorlist/?country=all&ip_version=4&use_mirror_status=on'
-	gawk -i assert -i inplace '
-		/^#Server / { $0 = substr($0, 2); ++f }
-		{ print } END { assert(f > 0, "f > 0") }' /etc/pacman.d/mirrorlist
 	cat <<-'EOF' > /etc/systemd/system/pacman-init.service
 		[Unit]
 		Description=Pacman keyring initialization
