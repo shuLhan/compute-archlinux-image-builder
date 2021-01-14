@@ -17,7 +17,7 @@ Arch Linux installation are the following:
 - A minimal initcpio is configured for booting on Compute Engine virtual
   machines.
 - Root filesystem is ext4.
-- Locale is set to en_US.UTF-8 and timezone is set to UTC.
+- Locale is set to en_GB.UTF-8 and timezone is set to UTC.
 - Network is configured through dhclient.
 - Systemd-timesyncd is enabled and configured to use the Compute Engine metadata
   server.
