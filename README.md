@@ -103,6 +103,15 @@ want:
 $ gsutil rm gs://BUCKET_NAME/arch-vDATE.tar.gz
 ```
 
+## Testing with qemu
+
+Change the owner of disk or tar.gz files to your own user and then run
+
+```
+$ ./qemu.sh <disk | image-name>
+```
+
+
 ## Contributing Changes
 
 * See [CONTRIB.md](CONTRIB.md)
