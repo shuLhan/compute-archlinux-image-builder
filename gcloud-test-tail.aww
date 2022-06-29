@@ -1,0 +1,4 @@
+#require: gcloud config configurations activate {{.Val "gcloud::config"}}
+
+gcloud compute instances get-serial-port-output {{.Val "host::name"}} \
+	--zone={{.Val "gcloud::zone"}}

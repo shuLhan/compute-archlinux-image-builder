@@ -1,0 +1,17 @@
+## Script to test the official public image.
+
+#require: gcloud config configurations activate {{.Val "gcloud::config"}}
+
+gcloud compute instances create arch-test \
+	--zone={{.Val "gcloud::zone"}} \
+	--image-project=arch-linux-gce \
+	--image-family=arch \
+	--machine-type=f1-micro
+
+gcloud compute instances describe arch-test \
+	--zone={{.Val "gcloud::zone"}}
+
+gcloud compute ssh \
+	--zone={{.Val "gcloud::zone"}} \
+	--command="lsblk -o NAME,UUID,MOUNTPOINTS; cat /etc/fstab; timedatectl show-timesync; localectl" \
+	arch-test
