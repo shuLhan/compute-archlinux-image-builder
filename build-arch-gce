@@ -110,6 +110,10 @@ echo '-- Configuring journald.'
 mkdir -p $mount_dir/etc/systemd/journald.conf.d
 cp ./sys/etc/systemd/journald.conf.d/00-google.conf $mount_dir/etc/systemd/journald.conf.d/
 
+## Disable password authentication and root login on SSH server.
+echo '-- Configuring ssh.'
+cp ./sys/etc/ssh/sshd_config $mount_dir/etc/ssh/
+
 arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	set -eEuo pipefail
 	trap 'echo "Error: \`$BASH_COMMAND\` exited with status $?"' ERR
@@ -121,11 +125,7 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	echo '-- Running locale-gen.'
 	locale-gen
 
-	echo '-- Configuring ssh.'
-	gawk -i assert -i inplace '
-		/^#PasswordAuthentication / { $0 = "PasswordAuthentication no"; ++f1 }
-		/^#PermitRootLogin / { $0 = "PermitRootLogin no"; ++f2 }
-		{ print } END { assert(f1 * f2 == 1, "f == 1") }' /etc/ssh/sshd_config
+	echo '-- Enabling sshd service.'
 	systemctl --quiet enable sshd.service
 
 	echo '-- Configuring pacman.'
