@@ -114,6 +114,9 @@ cp ./sys/etc/systemd/journald.conf.d/00-google.conf $mount_dir/etc/systemd/journ
 echo '-- Configuring ssh.'
 cp ./sys/etc/ssh/sshd_config $mount_dir/etc/ssh/
 
+echo '-- Creating pacman-init service.'
+cp ./sys/etc/systemd/system/pacman-init.service $mount_dir/etc/systemd/system/
+
 arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	set -eEuo pipefail
 	trap 'echo "Error: \`$BASH_COMMAND\` exited with status $?"' ERR
@@ -134,20 +137,8 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	gawk -i assert -i inplace '
 		/^#Server / { $0 = substr($0, 2); ++f }
 		{ print } END { assert(f > 0, "f > 0") }' /etc/pacman.d/mirrorlist
-	cat <<-'EOF' > /etc/systemd/system/pacman-init.service
-		[Unit]
-		Description=Pacman keyring initialization
-		ConditionDirectoryNotEmpty=!/etc/pacman.d/gnupg
 
-		[Service]
-		Type=oneshot
-		RemainAfterExit=yes
-		ExecStart=/usr/bin/pacman-key --init
-		ExecStart=/usr/bin/pacman-key --populate archlinux
-
-		[Install]
-		WantedBy=multi-user.target
-	EOF
+	echo '-- Enabling pacman-init service.'
 	systemctl --quiet enable pacman-init.service
 
 	echo '-- Configuring systemd-repart.'
