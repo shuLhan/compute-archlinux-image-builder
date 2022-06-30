@@ -106,6 +106,10 @@ echo '-- Configuring locale.'
 cp ./sys/etc/locale.gen $mount_dir/etc/locale.gen
 cp ./sys/etc/locale.conf $mount_dir/etc/locale.conf
 
+echo '-- Configuring journald.'
+mkdir -p $mount_dir/etc/systemd/journald.conf.d
+cp ./sys/etc/systemd/journald.conf.d/00-google.conf $mount_dir/etc/systemd/journald.conf.d/
+
 arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	set -eEuo pipefail
 	trap 'echo "Error: \`$BASH_COMMAND\` exited with status $?"' ERR
@@ -116,11 +120,6 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 
 	echo '-- Running locale-gen.'
 	locale-gen
-
-	echo '-- Configuring journald.'
-	gawk -i assert -i inplace '
-		/^#ForwardToConsole=/ { $0 = "ForwardToConsole=yes"; ++f }
-		{ print } END { assert(f == 1, "f == 1") }' /etc/systemd/journald.conf
 
 	echo '-- Configuring ssh.'
 	gawk -i assert -i inplace '
