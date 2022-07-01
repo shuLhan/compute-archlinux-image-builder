@@ -102,6 +102,10 @@ echo '-- Configuring NTP.'
 mkdir -p $mount_dir/etc/systemd/timesyncd.conf.d/
 cp ./sys/etc/systemd/timesyncd.conf.d/00-google.conf $mount_dir/etc/systemd/timesyncd.conf.d/
 
+echo '-- Configuring locale.'
+cp ./sys/etc/locale.gen $mount_dir/etc/locale.gen
+cp ./sys/etc/locale.conf $mount_dir/etc/locale.conf
+
 arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	set -eEuo pipefail
 	trap 'echo "Error: \`$BASH_COMMAND\` exited with status $?"' ERR
@@ -110,12 +114,8 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 	systemctl --quiet enable systemd-timesyncd.service
 
-	echo '-- Configuring locale.'
-	gawk -i assert -i inplace '
-		/^#en_US\.UTF-8 UTF-8\s*$/ { $0 = substr($0, 2); ++f }
-		{ print } END { assert(f == 1, "f == 1") }' /etc/locale.gen
+	echo '-- Running locale-gen.'
 	locale-gen
-	echo 'LANG=en_US.UTF-8' > /etc/locale.conf
 
 	echo '-- Configuring journald.'
 	gawk -i assert -i inplace '
