@@ -77,7 +77,7 @@ append_gce_repo() {
 }
 cp /etc/pacman.conf "$work_dir"
 append_gce_repo "$work_dir/pacman.conf"
-pacstrap -G -M -C "$work_dir/pacman.conf" -- "$mount_dir" \
+pacstrap -c -G -M -C "$work_dir/pacman.conf" -- "$mount_dir" \
 	base linux dosfstools e2fsprogs dhclient openssh sudo google-compute-engine
 append_gce_repo "$mount_dir/etc/pacman.conf"
 
