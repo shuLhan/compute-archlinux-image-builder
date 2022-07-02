@@ -177,31 +177,15 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 
 	echo '-- Running boot loader.'
 	bootctl install --no-variables --quiet
-
-	echo '-- Configuring boot loader.'
-	cat <<-'EOF' > /boot/loader/loader.conf
-		default arch.conf
-		editor no
-	EOF
-	cat <<-'EOF' > /boot/loader/entries/arch.conf
-		title   Arch Linux
-		linux   /vmlinuz-linux
-		initrd  /initramfs-linux.img
-		options rw console=ttyS0,38400n8 net.ifnames=0 scsi_mod.use_blk_mq=Y
-	EOF
-	mkdir -p -- "/etc/pacman.d/hooks"
-	cat <<-'EOF' > /etc/pacman.d/hooks/00-systemd-boot.hook
-		[Trigger]
-		Type = Package
-		Operation = Upgrade
-		Target = systemd
-
-		[Action]
-		Description = Gracefully upgrading systemd-boot...
-		When = PostTransaction
-		Exec = /usr/bin/systemctl restart systemd-boot-update.service
-	EOF
 EOS
+
+echo '- Configuring boot loader.'
+cp ./sys/efi/loader/loader.conf $mount_dir/boot/loader/
+cp ./sys/efi/loader/entries/arch.conf $mount_dir/boot/loader/entries/
+
+echo '- Configuring pacman hooks.'
+mkdir -p -- "$mount_dir/etc/pacman.d/hooks"
+cp ./sys/etc/pacman.d/hooks/00-systemd-boot.hook $mount_dir/etc/pacman.d/hooks/
 
 echo '- Cleaning up and finalizing the image.'
 > "$mount_dir/etc/machine-id"
