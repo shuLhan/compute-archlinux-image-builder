@@ -65,21 +65,9 @@ mkdir -p -- "$mount_dir/boot"
 mount -- "$efi_dev" "$mount_dir/boot"
 
 echo '- Installing Arch Linux.'
-append_gce_repo() {
-	gawk -i inplace '
-		/^\[gce\]$/ { found = 1 } { print }
-		ENDFILE { if (!found) {
-			print ""
-			print "[gce]"
-			print "Server = https://storage.googleapis.com/arch-linux-gce/repo"
-			print "SigLevel = Optional TrustAll"
-		} }' "$1"
-}
-cp /etc/pacman.conf "$work_dir"
-append_gce_repo "$work_dir/pacman.conf"
-pacstrap -c -G -M -C "$work_dir/pacman.conf" -- "$mount_dir" \
+pacstrap -c -G -M -C "./sys/etc/pacman.conf" -- "$mount_dir" \
 	base linux dosfstools e2fsprogs dhclient openssh sudo google-compute-engine
-append_gce_repo "$mount_dir/etc/pacman.conf"
+cp -f ./sys/etc/pacman.conf "$mount_dir/etc/pacman.conf"
 
 echo '- Configuring fstab.'
 root_uuid=$(lsblk --noheadings --raw --output UUID -- "$root_dev")
