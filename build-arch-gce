@@ -117,6 +117,10 @@ cp ./sys/etc/ssh/sshd_config $mount_dir/etc/ssh/
 echo '-- Creating pacman-init service.'
 cp ./sys/etc/systemd/system/pacman-init.service $mount_dir/etc/systemd/system/
 
+echo '-- Configuring initcpio.'
+cp ./sys/etc/mkinitcpio.conf $mount_dir/etc/
+cp ./sys/etc/mkinitcpio.d/linux.preset $mount_dir/etc/mkinitcpio.d/
+
 arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	set -eEuo pipefail
 	trap 'echo "Error: \`$BASH_COMMAND\` exited with status $?"' ERR
@@ -156,16 +160,7 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	echo '-- Enabling other services.'
 	systemctl --quiet enable dhclient@eth0.service
 
-	echo '-- Configuring initcpio.'
-	gawk -i assert -i inplace '
-		/^MODULES=/ { $0 = "MODULES=(virtio_pci virtio_scsi sd_mod ext4)"; ++f1 }
-		/^BINARIES=/ { $0 = "BINARIES=(fsck fsck.ext4)"; ++f2 }
-		/^HOOKS=/ { $0 = "HOOKS=(systemd modconf)"; ++f3 }
-		{ print } END { assert(f1 * f2 * f3 == 1, "f == 1") }' /etc/mkinitcpio.conf
-	gawk -i assert -i inplace '
-		/^PRESETS=/ { $0 = "PRESETS=(default)"; ++f }
-		/#?fallback_/ { next }
-		{ print } END { assert(f == 1, "f == 1") }' /etc/mkinitcpio.d/linux.preset
+	echo '-- Running mkinitcpio.'
 	rm /boot/initramfs-linux-fallback.img
 	mkinitcpio --nocolor --preset linux
 
