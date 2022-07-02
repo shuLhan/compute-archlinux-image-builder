@@ -70,7 +70,8 @@ rsync -r /var/lib/pacman/sync/ $mount_dir/var/lib/pacman/sync/
 
 echo '- Installing Arch Linux.'
 pacstrap -c -C "./sys/etc/pacman.conf" -- "$mount_dir" \
-	base linux dosfstools e2fsprogs dhclient openssh sudo google-compute-engine
+	base linux dosfstools e2fsprogs dhclient openssh sudo google-compute-engine \
+	vim-minimal tmux mosh rsync unzip
 cp -f ./sys/etc/pacman.conf "$mount_dir/etc/pacman.conf"
 
 echo '- Configuring fstab.'
