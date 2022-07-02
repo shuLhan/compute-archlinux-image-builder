@@ -71,7 +71,8 @@ rsync -r /var/lib/pacman/sync/ $mount_dir/var/lib/pacman/sync/
 echo '- Installing Arch Linux.'
 pacstrap -c -C "./sys/etc/pacman.conf" -- "$mount_dir" \
 	base linux dosfstools e2fsprogs dhclient openssh sudo google-compute-engine \
-	vim-minimal tmux mosh rsync unzip
+	vim-minimal tmux mosh rsync unzip \
+	google-cloud-ops-agent-git
 cp -f ./sys/etc/pacman.conf "$mount_dir/etc/pacman.conf"
 
 echo '- Configuring fstab.'
@@ -149,6 +150,9 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 		[Unit]
 		Before=systemd-growfs@-.service
 	EOF
+
+	echo '-- Enabling google-cloud-ops-agent.service'
+	systemctl --quiet enable google-cloud-ops-agent.service
 
 	echo '-- Enabling other services.'
 	systemctl --quiet enable dhclient@eth0.service

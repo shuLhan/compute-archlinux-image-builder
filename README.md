@@ -39,6 +39,8 @@ Arch Linux installation are the following:
 - An additional Pacman repository is used to install and keep the [Linux Guest
   Environment](https://aur.archlinux.org/packages/google-compute-engine/)
   packages up to date.
+- Ops-agent package installed from
+  [AUR at build.kilabit.info](https://build.kilabit.info).
 
 ## Prebuilt Images
 
