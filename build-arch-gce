@@ -92,6 +92,16 @@ print_fstab() {
 
 echo '- Running additional setup in chroot.'
 
+echo '-- Configuring systemd-repart.'
+
+mkdir -p $mount_dir/etc/repart.d
+cp -f ./sys/etc/repart.d/root.conf \
+	$mount_dir/etc/repart.d/
+
+mkdir -p $mount_dir/etc/systemd/system/systemd-repart.service.d
+cp -f ./sys/etc/systemd/system/systemd-repart.service.d/override.conf \
+	$mount_dir/etc/systemd/system/systemd-repart.service.d/
+
 echo '-- Configuring NTP.'
 mkdir -p $mount_dir/etc/systemd/timesyncd.conf.d/
 cp ./sys/etc/systemd/timesyncd.conf.d/00-google.conf $mount_dir/etc/systemd/timesyncd.conf.d/
@@ -138,18 +148,6 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 
 	echo '-- Enabling pacman-init service.'
 	systemctl --quiet enable pacman-init.service
-
-	echo '-- Configuring systemd-repart.'
-	mkdir -p /etc/repart.d
-	cat <<-'EOF' > /etc/repart.d/root.conf
-		[Partition]
-		Type=root
-	EOF
-	mkdir -p /etc/systemd/system/systemd-repart.service.d
-	cat <<-'EOF' > /etc/systemd/system/systemd-repart.service.d/override.conf
-		[Unit]
-		Before=systemd-growfs@-.service
-	EOF
 
 	echo '-- Enabling google-cloud-ops-agent.service'
 	systemctl --quiet enable google-cloud-ops-agent.service
