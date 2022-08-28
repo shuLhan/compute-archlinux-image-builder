@@ -118,6 +118,9 @@ cp ./sys/etc/systemd/journald.conf.d/00-google.conf $mount_dir/etc/systemd/journ
 echo '-- Configuring ssh.'
 cp ./sys/etc/ssh/sshd_config $mount_dir/etc/ssh/
 
+echo '-- Configuring pacman mirrorlist.'
+cp -f ./sys/etc/pacman.d/mirrorlist $mount_dir/etc/pacman.d/mirrorlist
+
 echo '-- Creating pacman-init service.'
 cp ./sys/etc/systemd/system/pacman-init.service $mount_dir/etc/systemd/system/
 
@@ -138,13 +141,6 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 
 	echo '-- Enabling sshd service.'
 	systemctl --quiet enable sshd.service
-
-	echo '-- Configuring pacman.'
-	curl --silent --show-error -o /etc/pacman.d/mirrorlist \
-		'https://archlinux.org/mirrorlist/?country=all&ip_version=4&use_mirror_status=on'
-	gawk -i assert -i inplace '
-		/^#Server / { $0 = substr($0, 2); ++f }
-		{ print } END { assert(f > 0, "f > 0") }' /etc/pacman.d/mirrorlist
 
 	echo '-- Enabling pacman-init service.'
 	systemctl --quiet enable pacman-init.service
