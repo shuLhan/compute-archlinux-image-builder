@@ -1,0 +1,20 @@
+## Script to remove all except the last five images.
+
+#require: gcloud config configurations activate {{.Val "gcloud::config"}}
+
+gcloud compute images list \
+	--no-standard-images \
+	--show-deprecated \
+	--format="value(NAME)"
+
+gcloud compute images list \
+	--no-standard-images \
+	--show-deprecated \
+	--format="value(NAME)" \
+	| head --lines=-5 \
+	| xargs gcloud compute images delete --quiet
+
+gcloud compute images list \
+	--no-standard-images \
+	--show-deprecated \
+	--format="value(NAME)"
