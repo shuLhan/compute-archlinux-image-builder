@@ -4,8 +4,9 @@
 
 gcloud compute images list \
 	--no-standard-images \
-	--show-deprecated \
-	--format="value(NAME)"
+	> current-images.txt
+
+cat current-images.txt
 
 gcloud compute images list \
 	--no-standard-images \
@@ -16,5 +17,6 @@ gcloud compute images list \
 
 gcloud compute images list \
 	--no-standard-images \
-	--show-deprecated \
-	--format="value(NAME)"
+	> current-images.txt
+
+cat current-images.txt
