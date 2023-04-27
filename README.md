@@ -51,10 +51,10 @@ command](https://cloud.google.com/sdk/gcloud/reference/compute/instances/create)
 
 ```console
 $ gcloud compute instances create INSTANCE_NAME \
-      --image-project=arch-linux-gce --image-family=arch
+      --image-project=arch-builder --image-family=arch
 ```
 
-For older images, see the current_images.txt file.
+For older images, see the current-images.txt file.
 
 ## Build Your Own Image
 
@@ -64,7 +64,7 @@ You can build the Arch Linux image yourself with the following procedure:
 
     ```console
     $ sudo pacman -S --needed arch-install-scripts dosfstools e2fsprogs
-    $ git clone https://github.com/GoogleCloudPlatform/compute-archlinux-image-builder.git
+    $ git clone https://github.com/shuLhan/compute-archlinux-image-builder.git
     $ cd compute-archlinux-image-builder
     $ sudo ./build-arch-gce
     ```
