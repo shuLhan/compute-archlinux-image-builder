@@ -10,10 +10,9 @@ cat current-images.txt
 
 gcloud compute images list \
 	--no-standard-images \
-	--show-deprecated \
 	--format="value(NAME)" \
 	| head --lines=-5 \
-	| xargs gcloud compute images delete --quiet
+	| xargs --no-run-if-empty gcloud compute images delete --quiet
 
 gcloud compute images list \
 	--no-standard-images \
