@@ -7,7 +7,7 @@ gcloud compute instances create arch-test \
 	--zone={{.Val "gcloud::zone"}} \
 	--image={{.Val "host::image"}} \
 	--metadata=block-project-ssh-keys=TRUE \
-	--machine-type=f1-micro
+	--machine-type=e2-micro
 
 gcloud compute instances describe arch-test \
 	--zone={{.Val "gcloud::zone"}}
