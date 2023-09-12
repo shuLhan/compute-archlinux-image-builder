@@ -62,7 +62,8 @@ mount -- "$root_dev" "$mount_dir"
 
 echo '- Mounting the boot partition.'
 mkdir -p -- "$mount_dir/boot"
-mount -- "$boot_dev" "$mount_dir/boot"
+chmod 0700 "$mount_dir/boot"
+mount -o uid=0,gid=0,fmask=0077,dmask=0077 -- "$boot_dev" "$mount_dir/boot"
 
 echo '- Copy the host pacman database caches'
 mkdir -p $mount_dir/var/lib/pacman/sync
@@ -87,7 +88,7 @@ print_fstab() {
 } >> "$mount_dir/etc/fstab"
 {
 	print_fstab root "$root_uuid" / ext4 rw,discard,errors=remount-ro,x-systemd.growfs 0 1
-	print_fstab boot "$boot_uuid" /boot vfat uid=root,gid=root,umask=022,showexec 0 0
+	print_fstab boot "$boot_uuid" /boot vfat uid=0,gid=0,fmask=0077,dmask=0077,showexec 0 0
 }
 
 echo '- Running additional setup in chroot.'
