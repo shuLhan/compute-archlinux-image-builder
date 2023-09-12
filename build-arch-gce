@@ -128,6 +128,10 @@ echo '-- Configuring initcpio.'
 cp ./sys/etc/mkinitcpio.conf $mount_dir/etc/
 cp ./sys/etc/mkinitcpio.d/linux.preset $mount_dir/etc/mkinitcpio.d/
 
+echo '-- Configuring Google Cloud Ops Agent.'
+mkdir -p $mount_dir/etc/google-cloud-ops-agent/
+cp ./sys/etc/google-cloud-ops-agent/config.yaml $mount_dir/etc/google-cloud-ops-agent/
+
 arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	set -eEuo pipefail
 	trap 'echo "Error: \`$BASH_COMMAND\` exited with status $?"' ERR

@@ -1,6 +1,6 @@
 NAME            PROJECT       FAMILY  DEPRECATED  STATUS
-arch-v20230216  arch-builder  arch                READY
-arch-v20230223  arch-builder  arch                READY
-arch-v20230302  arch-builder  arch                READY
-arch-v20230313  arch-builder  arch                READY
-arch-v20230320  arch-builder  arch                READY
+arch-v20230812  arch-builder  arch                READY
+arch-v20230819  arch-builder  arch                READY
+arch-v20230902  arch-builder  arch                READY
+arch-v20230906  arch-builder  arch                READY
+arch-v20230912  arch-builder  arch                READY
