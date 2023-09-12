@@ -4,26 +4,32 @@
 
 gsutil cp {{.Val "host::image"}}.tar.gz gs://arch-builder-a/image/
 
-gcloud compute images delete {{.Val "host::image"}} --quiet || exit 0
+gcloud compute images delete {{.Val "host::image"}} --project={{.Val "gcloud::project"}} --quiet || exit 0
 
 gcloud compute images create {{.Val "host::image"}} \
+	--project={{.Val "gcloud::project"}} \
 	--source-uri=gs://arch-builder-a/image/{{.Val "host::image"}}.tar.gz \
 	--family=arch \
 	--guest-os-features=GVNIC,UEFI_COMPATIBLE,VIRTIO_SCSI_MULTIQUEUE \
 	--description="Arch linux image with ops-agent. See https://github.com/shuLhan/compute-archlinux-image-builder"
 
 gcloud compute images deprecate {{.Val "host::image"}} \
+	--project={{.Val "gcloud::project"}} \
 	--state=ACTIVE \
 	--deprecate-in=30d \
 	--obsolete-in=37d \
 	--delete-in=44d
 
-gcloud compute images list --no-standard-images
-gcloud compute images describe {{.Val "host::image"}}
+gcloud compute images list --no-standard-images \
+	--project={{.Val "gcloud::project"}}
+
+gcloud compute images describe {{.Val "host::image"}} \
+	--project={{.Val "gcloud::project"}}
 
 ## Share the image publicly with authenticated users.
 
 gcloud compute images add-iam-policy-binding {{.Val "host::image"}} \
+	--project={{.Val "gcloud::project"}} \
     --member='allAuthenticatedUsers' \
     --role='roles/compute.imageUser'
 
