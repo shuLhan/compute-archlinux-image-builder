@@ -20,6 +20,20 @@ gcloud compute ssh \
 	--command="lsblk -o NAME,UUID,MOUNTPOINTS; cat /etc/fstab; timedatectl show-timesync; localectl" \
 	arch-test
 
+gcloud compute ssh \
+	--zone={{.Val "gcloud::zone"}} \
+	arch-test
+
+## Test OS Login.
+
+gcloud compute instances add-metadata arch-test \
+	--zone={{.Val "gcloud::zone"}} \
+	--metadata=enable-oslogin=TRUE
+
+gcloud compute instances add-metadata arch-test \
+	--zone={{.Val "gcloud::zone"}} \
+	--metadata=enable-oslogin-2fa=TRUE
+
 ##---- Cleaning up.
 
 gcloud compute instances stop arch-test \
