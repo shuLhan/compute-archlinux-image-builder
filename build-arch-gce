@@ -73,7 +73,7 @@ echo '- Installing Arch Linux.'
 pacstrap -c -C "./sys/etc/pacman.conf" -- "$mount_dir" \
 	base linux dosfstools e2fsprogs dhclient openssh sudo google-compute-engine \
 	vim-minimal tmux mosh rsync unzip \
-	google-cloud-ops-agent-git
+	google-cloud-ops-agent-git google-compute-engine-oslogin
 cp -f ./sys/etc/pacman.conf "$mount_dir/etc/pacman.conf"
 
 echo '- Configuring fstab.'
