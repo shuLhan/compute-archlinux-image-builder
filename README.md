@@ -1,8 +1,9 @@
 ## Arch Linux Image Builder for Google Compute Engine
 
-This project provides a script that creates an [Arch
-Linux](https://www.archlinux.org/) image that can run on [Google Compute
-Engine](https://cloud.google.com/compute/).
+This project provides a script that creates an
+[Arch Linux](https://www.archlinux.org/)
+image that can run on
+[Google Compute Engine](https://cloud.google.com/compute/).
 
 The image is configured to be as close as possible to a base Arch Linux
 installation, while still allowing it to be fully functional and optimized for
@@ -55,6 +56,9 @@ $ gcloud compute instances create INSTANCE_NAME \
 ```
 
 For older images, see the current-images.txt file.
+List of latest images is available
+[here](https://build.kilabit.info/compute-archlinux-image-builder/current-images.txt),
+build and updated once a week (usually at Friday morning UTC).
 
 ## Build Your Own Image
 
@@ -107,7 +111,7 @@ $ gsutil rm gs://BUCKET_NAME/arch-vDATE.tar.gz
 
 ## Testing with qemu
 
-Change the owner of disk or tar.gz files to your own user and then run
+Change the owner of disk or tar.gz file to your own user and then run
 
 ```
 $ ./qemu.sh <disk | image-name>
@@ -116,12 +120,13 @@ $ ./qemu.sh <disk | image-name>
 
 ## Contributing Changes
 
-* See [CONTRIB.md](CONTRIB.md)
+See [CONTRIB.md](CONTRIB.md).
 
 ## Licensing
 
-All files in this repository are under the [Apache License, Version
-2.0](LICENSE) unless noted otherwise.
+All files in this repository are under the
+[Apache License, Version 2.0](LICENSE)
+unless noted otherwise.
 
 ## Support
 
