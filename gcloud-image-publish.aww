@@ -2,7 +2,7 @@
 
 #require: gcloud config configurations activate {{.Val "gcloud::config"}}
 
-gsutil cp {{.Val "host::image"}}.tar.gz gs://arch-builder-a/image/
+gcloud storage cp {{.Val "host::image"}}.tar.gz gs://arch-builder-a/image/{{.Val "host::image"}}.tar.gz
 
 gcloud compute images delete {{.Val "host::image"}} --project={{.Val "gcloud::project"}} --quiet || exit 0
 
@@ -35,5 +35,5 @@ gcloud compute images add-iam-policy-binding {{.Val "host::image"}} \
 
 ## Delete the image on storage.
 
-gsutil rm -a gs://arch-builder-a/image/**
-gsutil ls gs://arch-builder-a/
+gcloud storage rm --all-versions gs://arch-builder-a/image/**
+gcloud storage ls gs://arch-builder-a/
