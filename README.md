@@ -10,6 +10,8 @@ installation, while still allowing it to be fully functional and optimized for
 Compute Engine.  Notable choices made and differences compared to a standard
 Arch Linux installation are the following:
 
+- systemd-networkd is used to manage networks.
+- systemd-resolved is used to manage resolv.conf (DNS).
 - systemd-boot is used with a UEFI-based boot and a GPT partition table.
 - Serial console logging is enabled from kernel command line and journald is
   configured to forward to it.
