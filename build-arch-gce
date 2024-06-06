@@ -71,7 +71,7 @@ rsync -r /var/lib/pacman/sync/ $mount_dir/var/lib/pacman/sync/
 
 echo '- Installing Arch Linux.'
 pacstrap -c -C "./sys/etc/pacman.conf" -- "$mount_dir" \
-	base linux dosfstools e2fsprogs dhclient openssh sudo google-compute-engine \
+	base linux dosfstools e2fsprogs openssh polkit sudo google-compute-engine \
 	vim-minimal tmux mosh rsync unzip \
 	google-cloud-ops-agent-git google-compute-engine-oslogin
 cp -f ./sys/etc/pacman.conf "$mount_dir/etc/pacman.conf"
@@ -133,6 +133,10 @@ echo '-- Configuring Google Cloud Ops Agent.'
 mkdir -p $mount_dir/etc/google-cloud-ops-agent/
 cp ./sys/etc/google-cloud-ops-agent/config.yaml $mount_dir/etc/google-cloud-ops-agent/
 
+echo '-- Configuring network.'
+mkdir -p $mount_dir/etc/systemd/network/
+cp ./sys/etc/systemd/network/10-eth0.network $mount_dir/etc/systemd/network/
+
 arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	set -eEuo pipefail
 	trap 'echo "Error: \`$BASH_COMMAND\` exited with status $?"' ERR
@@ -144,6 +148,10 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	echo '-- Running locale-gen.'
 	locale-gen
 
+	echo '-- Enabling systemd-networkd.service.'
+	systemctl --quiet enable systemd-networkd.service
+	systemctl --quiet enable systemd-resolved.service
+
 	echo '-- Enabling sshd service.'
 	systemctl --quiet enable sshd.service
 
@@ -152,9 +160,6 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 
 	echo '-- Enabling google-cloud-ops-agent.service'
 	systemctl --quiet enable google-cloud-ops-agent.service
-
-	echo '-- Enabling other services.'
-	systemctl --quiet enable dhclient@eth0.service
 
 	echo '-- Running mkinitcpio.'
 	mkinitcpio --nocolor --preset linux

@@ -17,7 +17,10 @@ gcloud compute instances tail-serial-port-output {{.Val "host::name"}} \
 
 gcloud compute ssh \
 	--zone={{.Val "gcloud::zone"}} \
-	--command="lsblk -o NAME,UUID,MOUNTPOINTS; cat /etc/fstab; timedatectl show-timesync; localectl" \
+	--command="lsblk -o NAME,UUID,MOUNTPOINTS; cat /etc/fstab; \
+		cat /etc/resolv.conf; timedatectl show-timesync; localectl; \
+		sudo pacman -Sy" \
+	--quiet \
 	arch-test
 
 gcloud compute ssh \
