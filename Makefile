@@ -12,6 +12,10 @@ publish:
 	awwan local gcloud-image-publish.aww 5-
 	awwan local gcloud-image-cleanup.aww 5-
 
+.PHONY: test
+test:
+	awwan local gcloud-image-test.aww 4-18
+
 ## Preview the .md files in local using ciigo [1].
 .PHONY: serve-doc
 serve-doc:
