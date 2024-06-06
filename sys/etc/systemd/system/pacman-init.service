@@ -1,12 +1,12 @@
 [Unit]
 Description=Pacman keyring initialization
-ConditionDirectoryNotEmpty=!/etc/pacman.d/gnupg
+Wants=network-online.target
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/pacman-key --init
-ExecStart=/usr/bin/pacman-key --populate archlinux
+ExecStart=/usr/bin/pacman-key --recv-key B24B7E71D51210D9292E1B3E4A5360B500C9C4F0
+ExecStart=/usr/bin/pacman-key --lsign-key B24B7E71D51210D9292E1B3E4A5360B500C9C4F0
 
 [Install]
 WantedBy=multi-user.target
