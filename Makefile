@@ -7,6 +7,10 @@ image:
 	ini set host::image $$(basename -s .tar.gz `ls *.tar.gz | tail -1`) awwan.env
 	ls -lh
 
+.PHONY: image-qemu
+image-qemu:
+	sudo IMAGE_QEMU=1 ./build-arch-gce
+
 .PHONY: publish
 publish:
 	awwan local gcloud-image-publish.aww 5-
