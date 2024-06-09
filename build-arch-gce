@@ -137,6 +137,19 @@ echo '-- Configuring network.'
 mkdir -p $mount_dir/etc/systemd/network/
 cp ./sys/etc/systemd/network/10-eth0.network $mount_dir/etc/systemd/network/
 
+if [[ -n "${IMAGE_QEMU:-}" ]]; then
+	echo '-- IMAGE_QEMU: Configuring sudoers.'
+	cp ./sys/etc/sudoers.d/wheel $mount_dir/etc/sudoers.d/wheel
+	chown root:root $mount_dir/etc/sudoers.d/wheel
+	chmod 0600 $mount_dir/etc/sudoers.d/wheel
+
+	echo '-- IMAGE_QEMU: Copying user arch SSH keys.'
+	mkdir -p $mount_dir/home/arch/.ssh
+	cp ./sys/home/arch/.ssh/id_ed25519 $mount_dir/home/arch/.ssh/
+	cp ./sys/home/arch/.ssh/id_ed25519.pub $mount_dir/home/arch/.ssh/
+	cp ./sys/home/arch/.ssh/authorized_keys $mount_dir/home/arch/.ssh/
+fi
+
 arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	set -eEuo pipefail
 	trap 'echo "Error: \`$BASH_COMMAND\` exited with status $?"' ERR
@@ -166,6 +179,16 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 
 	echo '-- Running boot loader.'
 	bootctl install --no-variables --quiet
+
+	if [[ -n "${IMAGE_QEMU:-}" ]]; then
+		echo '-- IMAGE_QEMU: Creating user arch.'
+		useradd --create-home --groups wheel arch
+		echo "arch:arch" | chpasswd
+
+		chown -R arch:arch /home/arch
+		chmod 0600 /home/arch/.ssh/
+		chmod 0600 /home/arch/.ssh/*
+	fi
 EOS
 
 echo '- Configuring boot loader.'
@@ -186,5 +209,6 @@ echo '- Building the compressed image.'
 disk_tar="arch-v$(date --utc +%Y%m%d).tar.gz"
 tar --sparse -czf "$work_dir/$disk_tar" --directory="$work_dir" disk.raw
 mv -- "$work_dir/$disk_tar" .
+mv -- "$work_dir/disk.raw" ./
 
 echo "Successfully built image \`$disk_tar\`."
