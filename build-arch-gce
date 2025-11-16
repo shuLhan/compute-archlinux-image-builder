@@ -157,7 +157,6 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	systemctl --quiet enable dhclient@eth0.service
 
 	echo '-- Running mkinitcpio.'
-	rm /boot/initramfs-linux-fallback.img
 	mkinitcpio --nocolor --preset linux
 
 	echo '-- Running boot loader.'
