@@ -70,11 +70,14 @@ mkdir -p $mount_dir/var/lib/pacman/sync
 rsync -r /var/lib/pacman/sync/ $mount_dir/var/lib/pacman/sync/
 
 echo '- Installing Arch Linux.'
-pacstrap -c -C "./sys/etc/pacman.conf" -- "$mount_dir" \
-	base linux dosfstools e2fsprogs openssh polkit sudo google-compute-engine \
-	vim-minimal tmux mosh rsync unzip \
-	google-cloud-ops-agent-git google-compute-engine-oslogin
+pacstrap -c -C "./sys/etc/pacman.conf.org" -M -- "$mount_dir" \
+	base linux dosfstools e2fsprogs openssh polkit sudo \
+	vim-minimal tmux mosh rsync unzip
+
 cp -f ./sys/etc/pacman.conf "$mount_dir/etc/pacman.conf"
+
+mkdir -p $mount_dir/etc/pacman.d/
+cp -f ./sys/etc/pacman.d/mirrorlist $mount_dir/etc/pacman.d/
 
 echo '- Configuring fstab.'
 root_uuid=$(lsblk --noheadings --raw --output UUID -- "$root_dev")
@@ -119,19 +122,12 @@ cp ./sys/etc/systemd/journald.conf.d/00-google.conf $mount_dir/etc/systemd/journ
 echo '-- Configuring ssh.'
 cp ./sys/etc/ssh/sshd_config $mount_dir/etc/ssh/
 
-echo '-- Configuring pacman mirrorlist.'
-cp -f ./sys/etc/pacman.d/mirrorlist $mount_dir/etc/pacman.d/mirrorlist
-
 echo '-- Creating pacman-init service.'
 cp ./sys/etc/systemd/system/pacman-init.service $mount_dir/etc/systemd/system/
 
 echo '-- Configuring initcpio.'
 cp ./sys/etc/mkinitcpio.conf $mount_dir/etc/
 cp ./sys/etc/mkinitcpio.d/linux.preset $mount_dir/etc/mkinitcpio.d/
-
-echo '-- Configuring Google Cloud Ops Agent.'
-mkdir -p $mount_dir/etc/google-cloud-ops-agent/
-cp ./sys/etc/google-cloud-ops-agent/config.yaml $mount_dir/etc/google-cloud-ops-agent/
 
 echo '-- Configuring network.'
 mkdir -p $mount_dir/etc/systemd/network/
@@ -154,6 +150,8 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	set -eEuo pipefail
 	trap 'echo "Error: \`$BASH_COMMAND\` exited with status $?"' ERR
 
+	ls -l /etc/pacman.d/gnupg/
+
 	echo '-- Configuring time.'
 	ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 	systemctl --quiet enable systemd-timesyncd.service
@@ -168,8 +166,16 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	echo '-- Enabling sshd service.'
 	systemctl --quiet enable sshd.service
 
-	echo '-- Enabling pacman-init service.'
-	systemctl --quiet enable pacman-init.service
+	echo '-- Installing google-compute-engine and guest-agent.'
+	## Import the key for build.kilabit.info repository.
+	pacman-key --recv-key 4A5360B500C9C4F0
+	pacman-key --lsign-key 4A5360B500C9C4F0
+
+	## The google-compute-engine depends on
+	## google-compute-engine-oslogin and google-guest-agent.
+	pacman -Syy --noconfirm \
+		google-compute-engine \
+		google-cloud-ops-agent-git
 
 	echo '-- Enabling google-cloud-ops-agent.service'
 	systemctl --quiet enable google-cloud-ops-agent.service
@@ -190,6 +196,10 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 		chmod 0600 /home/arch/.ssh/*
 	fi
 EOS
+
+echo '- Configuring Google Cloud Ops Agent.'
+mkdir -p $mount_dir/etc/google-cloud-ops-agent/
+cp ./sys/etc/google-cloud-ops-agent/config.yaml $mount_dir/etc/google-cloud-ops-agent/
 
 echo '- Configuring boot loader.'
 cp ./sys/efi/loader/loader.conf $mount_dir/boot/loader/

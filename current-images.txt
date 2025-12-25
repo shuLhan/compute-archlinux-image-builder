@@ -1,6 +1,35 @@
-NAME            PROJECT       FAMILY  DEPRECATED  STATUS
-arch-v20240511  arch-builder  arch                READY
-arch-v20240518  arch-builder  arch                READY
-arch-v20240525  arch-builder  arch                READY
-arch-v20240601  arch-builder  arch                READY
-arch-v20240606  arch-builder  arch                READY
+[
+  {
+    "archiveSizeBytes": "1714793856",
+    "creationTimestamp": "2025-12-25T03:51:49.084-08:00",
+    "description": "Arch linux image with ops-agent. See https://github.com/shuLhan/compute-archlinux-image-builder",
+    "diskSizeGb": "10",
+    "enableConfidentialCompute": false,
+    "family": "arch",
+    "guestOsFeatures": [
+      {
+        "type": "GVNIC"
+      },
+      {
+        "type": "UEFI_COMPATIBLE"
+      },
+      {
+        "type": "VIRTIO_SCSI_MULTIQUEUE"
+      }
+    ],
+    "id": "2806474738306685883",
+    "kind": "compute#image",
+    "labelFingerprint": "42WmSpB8rSM=",
+    "name": "arch-v20251225",
+    "rawDisk": {
+      "containerType": "TAR",
+      "source": ""
+    },
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/kilabit/global/images/arch-v20251225",
+    "sourceType": "RAW",
+    "status": "READY",
+    "storageLocations": [
+      "us"
+    ]
+  }
+]

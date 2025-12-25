@@ -35,6 +35,9 @@ Architecture = auto
 CheckSpace
 VerbosePkgLists
 #ParallelDownloads = 5
+DownloadUser = alpm
+#DisableSandboxFilesystem
+#DisableSandboxSyscalls
 
 # By default, pacman accepts packages signed by keys that its local keyring
 # trusts (see pacman-key and its man page), as well as unsigned packages.
@@ -95,6 +98,3 @@ Include = /etc/pacman.d/mirrorlist
 #[custom]
 #SigLevel = Optional TrustAll
 #Server = file:///home/custompkgs
-
-[build.kilabit.info]
-Server = https://build.kilabit.info/aur
