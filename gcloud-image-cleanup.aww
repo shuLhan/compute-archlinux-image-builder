@@ -1,9 +1,10 @@
 ## Script to remove all except the last five images.
 
-#require: gcloud config configurations activate {{.Val "gcloud::config"}}
+#require: gcloud config configurations activate {{.Val "gcloud:arch-builder:config"}}
 
 gcloud compute images list \
 	--no-standard-images \
+	--format=json \
 	> current-images.txt
 
 cat current-images.txt
@@ -16,6 +17,7 @@ gcloud compute images list \
 
 gcloud compute images list \
 	--no-standard-images \
+	--format=json \
 	> current-images.txt
 
 cat current-images.txt
