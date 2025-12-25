@@ -48,13 +48,13 @@ Arch Linux installation are the following:
 ## Prebuilt Images
 
 You can use [Cloud SDK](https://cloud.google.com/sdk/docs/) to create instances
-with the latest prebuilt Arch Linux image.  To do that follow the SDK
+with the latest prebuilt Arch Linux image. To do that follow the SDK
 installation procedure, and then run the [following
 command](https://cloud.google.com/sdk/gcloud/reference/compute/instances/create):
 
 ```console
 $ gcloud compute instances create INSTANCE_NAME \
-      --image-project=arch-builder --image-family=arch
+      --image-project=kilabit --image-family=arch
 ```
 
 For older images, see the current-images.txt file.

@@ -1,7 +1,7 @@
 [
   {
-    "archiveSizeBytes": "1714793856",
-    "creationTimestamp": "2025-12-25T03:51:49.084-08:00",
+    "archiveSizeBytes": "1706681216",
+    "creationTimestamp": "2025-12-25T04:57:15.452-08:00",
     "description": "Arch linux image with ops-agent. See https://github.com/shuLhan/compute-archlinux-image-builder",
     "diskSizeGb": "10",
     "enableConfidentialCompute": false,
@@ -17,7 +17,7 @@
         "type": "VIRTIO_SCSI_MULTIQUEUE"
       }
     ],
-    "id": "2806474738306685883",
+    "id": "8142640788025674309",
     "kind": "compute#image",
     "labelFingerprint": "42WmSpB8rSM=",
     "name": "arch-v20251225",
@@ -29,7 +29,7 @@
     "sourceType": "RAW",
     "status": "READY",
     "storageLocations": [
-      "us"
+      "asia"
     ]
   }
 ]
