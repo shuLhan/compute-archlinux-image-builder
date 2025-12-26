@@ -1,7 +1,7 @@
 [
   {
-    "archiveSizeBytes": "1706681216",
-    "creationTimestamp": "2025-12-25T04:57:15.452-08:00",
+    "archiveSizeBytes": "1661890432",
+    "creationTimestamp": "2025-12-25T05:29:49.707-08:00",
     "description": "Arch linux image with ops-agent. See https://github.com/shuLhan/compute-archlinux-image-builder",
     "diskSizeGb": "10",
     "enableConfidentialCompute": false,
@@ -17,7 +17,7 @@
         "type": "VIRTIO_SCSI_MULTIQUEUE"
       }
     ],
-    "id": "8142640788025674309",
+    "id": "7892614657072988835",
     "kind": "compute#image",
     "labelFingerprint": "42WmSpB8rSM=",
     "name": "arch-v20251225",
@@ -26,6 +26,39 @@
       "source": ""
     },
     "selfLink": "https://www.googleapis.com/compute/v1/projects/kilabit/global/images/arch-v20251225",
+    "sourceType": "RAW",
+    "status": "READY",
+    "storageLocations": [
+      "asia"
+    ]
+  },
+  {
+    "archiveSizeBytes": "961868992",
+    "creationTimestamp": "2025-12-25T23:14:59.097-08:00",
+    "description": "Arch linux image with ops-agent. See https://github.com/shuLhan/compute-archlinux-image-builder",
+    "diskSizeGb": "10",
+    "enableConfidentialCompute": false,
+    "family": "arch",
+    "guestOsFeatures": [
+      {
+        "type": "GVNIC"
+      },
+      {
+        "type": "UEFI_COMPATIBLE"
+      },
+      {
+        "type": "VIRTIO_SCSI_MULTIQUEUE"
+      }
+    ],
+    "id": "7907743400200473373",
+    "kind": "compute#image",
+    "labelFingerprint": "42WmSpB8rSM=",
+    "name": "arch-v20251226",
+    "rawDisk": {
+      "containerType": "TAR",
+      "source": ""
+    },
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/kilabit/global/images/arch-v20251226",
     "sourceType": "RAW",
     "status": "READY",
     "storageLocations": [

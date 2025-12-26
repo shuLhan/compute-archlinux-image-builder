@@ -122,9 +122,6 @@ cp ./sys/etc/systemd/journald.conf.d/00-google.conf $mount_dir/etc/systemd/journ
 echo '-- Configuring ssh.'
 cp ./sys/etc/ssh/sshd_config $mount_dir/etc/ssh/
 
-echo '-- Creating pacman-init service.'
-cp ./sys/etc/systemd/system/pacman-init.service $mount_dir/etc/systemd/system/
-
 echo '-- Configuring initcpio.'
 cp ./sys/etc/mkinitcpio.conf $mount_dir/etc/
 cp ./sys/etc/mkinitcpio.d/linux.preset $mount_dir/etc/mkinitcpio.d/
@@ -150,8 +147,6 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	set -eEuo pipefail
 	trap 'echo "Error: \`$BASH_COMMAND\` exited with status $?"' ERR
 
-	ls -l /etc/pacman.d/gnupg/
-
 	echo '-- Configuring time.'
 	ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 	systemctl --quiet enable systemd-timesyncd.service
@@ -166,7 +161,7 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 	echo '-- Enabling sshd service.'
 	systemctl --quiet enable sshd.service
 
-	echo '-- Installing google-compute-engine and guest-agent.'
+	echo '-- Installing google-compute-engine and ops-agent.'
 	## Import the key for build.kilabit.info repository.
 	pacman-key --recv-key 4A5360B500C9C4F0
 	pacman-key --lsign-key 4A5360B500C9C4F0
@@ -177,7 +172,6 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 		google-compute-engine \
 		google-cloud-ops-agent-git
 
-	echo '-- Enabling google-cloud-ops-agent.service'
 	systemctl --quiet enable google-cloud-ops-agent.service
 
 	echo '-- Running mkinitcpio.'
@@ -196,10 +190,6 @@ arch-chroot -- "$mount_dir" /bin/bash -s <<-'EOS'
 		chmod 0600 /home/arch/.ssh/*
 	fi
 EOS
-
-echo '- Configuring Google Cloud Ops Agent.'
-mkdir -p $mount_dir/etc/google-cloud-ops-agent/
-cp ./sys/etc/google-cloud-ops-agent/config.yaml $mount_dir/etc/google-cloud-ops-agent/
 
 echo '- Configuring boot loader.'
 cp ./sys/efi/loader/loader.conf $mount_dir/boot/loader/
