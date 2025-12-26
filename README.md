@@ -7,12 +7,15 @@ image that can run on
 
 The image is configured to be as close as possible to a base Arch Linux
 installation, while still allowing it to be fully functional and optimized for
-Compute Engine.  Notable choices made and differences compared to a standard
-Arch Linux installation are the following:
+Compute Engine.
+Notable choices made and differences compared to a standard Arch Linux
+installation are the following:
 
+- systemd-boot is used with a UEFI-based boot and a GPT partition table.
 - systemd-networkd is used to manage networks.
 - systemd-resolved is used to manage resolv.conf (DNS).
-- systemd-boot is used with a UEFI-based boot and a GPT partition table.
+- systemd-timesyncd is enabled and configured to synchronize time using the
+  Compute Engine metadata server.
 - Serial console logging is enabled from kernel command line and journald is
   configured to forward to it.
 - Block multiqueue is configured from the kernel command line to optimize
@@ -20,30 +23,28 @@ Arch Linux installation are the following:
 - A minimal initcpio is configured for booting on Compute Engine virtual
   machines.
 - Root filesystem is ext4.
-- Locale is set to en_GB.UTF-8 and timezone is set to UTC.
-- Network is configured through dhclient.
-- Systemd-timesyncd is enabled and configured to use the Compute Engine metadata
-  server.
-- Pacman keyring is configured to be built and initialized on first boot.
-- Pacman mirror list is taken fresh from Arch Linux servers at the time the
-  image is built.
-- [Linux Guest Environment for Google Compute
-  Engine](https://github.com/GoogleCloudPlatform/compute-image-packages) is
-  installed and enabled.
-- An OpenSSH server is installed and enabled, with root login and password
-  authentication forbidden.  User SSH keys are deployed and managed
-  automatically by the Linux Guest Environment as described in the
-  [corresponding
-  documentation](https://cloud.google.com/compute/docs/instances/connecting-to-instance).
-- Sudo is installed.  Permission to use sudo is managed automatically by Linux
-  Guest Environment.
-- Root partition and filesystem are automatically extended at boot using
+  Root partition and filesystem are automatically extended at boot using
   systemd-repart and systemd-growfs, to support dynamic disk resizing.
-- An additional Pacman repository is used to install and keep the [Linux Guest
-  Environment](https://aur.archlinux.org/packages/google-compute-engine/)
-  packages up to date.
-- Ops-agent package installed from
-  [AUR at build.kilabit.info](https://build.kilabit.info).
+- Locale is set to en_GB.UTF-8
+- Timezone is set to UTC.
+- An OpenSSH server is installed and enabled, with root login and password
+  authentication forbidden.
+  User SSH keys are deployed and managed automatically by the Linux Guest
+  Environment as described in the
+  [corresponding documentation](https://cloud.google.com/compute/docs/instances/connecting-to-instance).
+- Sudo is installed.
+  Permission to use sudo is managed automatically by Linux Guest Environment.
+
+An additional Pacman repository, build.kilabit.info, is used to install and
+keep the [Linux Guest Environment](https://docs.cloud.google.com/compute/docs/images/guest-environment)
+packages up to date.
+List of installed Linux Guest Environment packages and link to their
+corresponding AUR repository,
+
+- [google-cloud-ops-agent](https://aur.archlinux.org/packages/google-cloud-ops-agent-git)
+- [google-compute-engine](https://git.sr.ht/~shulhan/aur-google-compute-engine)
+- [google-compute-engine-oslogin](https://git.sr.ht/~shulhan/aur-google-compute-engine-oslogin)
+- [google-guest-agent](https://git.sr.ht/~shulhan/aur-google-guest-agent)
 
 ## Prebuilt Images
 
@@ -57,10 +58,11 @@ $ gcloud compute instances create INSTANCE_NAME \
       --image-project=kilabit --image-family=arch
 ```
 
-For older images, see the current-images.txt file.
 List of latest images is available
 [here](https://build.kilabit.info/compute-archlinux-image-builder/current-images.txt),
-build and updated once a week (usually at Friday morning UTC).
+build and updated
+[once a week](https://build.kilabit.info/karajo/app/#job_gcp-image-arch)
+(usually at Saturday morning at 01:00 UTC).
 
 ## Build Your Own Image
 
@@ -75,40 +77,53 @@ You can build the Arch Linux image yourself with the following procedure:
     $ sudo ./build-arch-gce
     ```
 
-    You can also use the `build-arch-gce` package from the AUR, and run
-    `sudo /usr/bin/build-arch-gce`
-
     If the build is successful, this will create an image file named
-    arch-vDATE.tar.gz in the current directory, where DATE is the current date.
+    arch-v$DATE.tar.gz in the current directory, where $DATE is the current
+    date.
 
 2.  Install and configure the [Cloud SDK](https://cloud.google.com/sdk/docs/).
 
-3.  Copy the image file to Google Cloud Storage:
+3.  Create new storage bucket to copy the image, or you can use the existing
+    one.
+    For example, this one create bucket in region asia-southeast1 under
+    project `$PROJECT_NAME`.
 
     ```console
-    $ gsutil mb gs://BUCKET_NAME
-    $ gsutil cp arch-vDATE.tar.gz gs://BUCKET_NAME
+    $ gcloud storage buckets create gs://$BUCKET_NAME \
+      --default-storage-class=standard \
+      --location=asia-southeast1 \
+      --project=$PROJECT_NAME \
+      --uniform-bucket-level-access
+
     ```
 
-4.  Import the image file to Google Cloud Engine as a new custom image:
+4.  Copy the local image file to Google Cloud Storage:
 
     ```console
-    $ gcloud compute images create IMAGE_NAME \
-          --source-uri=gs://BUCKET_NAME/arch-vDATE.tar.gz \
-          --guest-os-features=GVNIC,UEFI_COMPATIBLE,VIRTIO_SCSI_MULTIQUEUE
+    $ gcloud storage cp arch-v$DATE.tar.gz gs://$BUCKET_NAME/arch-v$DATE.tar.gz
+    ```
+
+5.  Import the image file to Google Compute Engine as a new custom image:
+
+    ```console
+    $ gcloud compute images create $IMAGE_NAME \
+          --family=arch \
+          --guest-os-features=GVNIC,UEFI_COMPATIBLE,VIRTIO_SCSI_MULTIQUEUE \
+          --project=$PROJECT_NAME \
+          --source-uri=gs://$BUCKET_NAME/arch-v$DATE.tar.gz
     ```
 
 You can now create new instances with your custom image:
 
 ```console
-$ gcloud compute instances create INSTANCE_NAME --image=IMAGE_NAME
+$ gcloud compute instances create INSTANCE_NAME --image=$IMAGE_NAME
 ```
 
-The Google Cloud Storage file is no longer needed, so you can delete it if you
+The image in storage file is no longer needed, so you can delete it if you
 want:
 
 ```console
-$ gsutil rm gs://BUCKET_NAME/arch-vDATE.tar.gz
+$ gcloud storage rm --all-versions gs://$BUCKET_NAME/arch-v$DATE.tar.gz
 ```
 
 ## Testing with qemu
@@ -118,7 +133,6 @@ Change the owner of disk or tar.gz file to your own user and then run
 ```
 $ ./qemu.sh <disk | image-name>
 ```
-
 
 ## Contributing Changes
 
@@ -132,5 +146,5 @@ unless noted otherwise.
 
 ## Support
 
-Google Inc. does not provide any support, guarantees, or warranty for this
+Google LLC does not provide any support, guarantees, or warranty for this
 project or the images provided.
